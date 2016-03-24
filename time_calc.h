@@ -15,6 +15,7 @@ void gettime(timespec* t)
 	clock_gettime(CLOCK_REALTIME, t);
 }
 
+//Returns time elapsed in milli seconds
 double time_elapsed(timespec start, timespec end)
 {
 	double t;
