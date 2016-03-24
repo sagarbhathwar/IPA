@@ -21,7 +21,7 @@ ipz_t ipz_add(ipz_t op1, ipz_t op2)
 	int l2 = strlen(op2);
 	int c = 0;
 	ipz_t result;
-	if(op1[0] == '9' || op2[0] == 9)
+	if(op1[0] == '9' || op2[0] == '9')
 	{
 		ipz_t __tmp1 = calloc(strlen(op1), sizeof(char));
 		ipz_t __tmp2 = calloc(strlen(op1), sizeof(char));
