@@ -6,8 +6,9 @@
 
 //Initialize the 'ipz_t' type variable
 //This should be called on evey variable
-void ipz_init(ipz_t x)
+void ipz_init(ipz_t* x)
 {
+    *x = malloc(sizeof(struct ipz));
     x->number = malloc(UINT_MAX*sizeof(digit));
     x->number_of_digits = 0;
 }
