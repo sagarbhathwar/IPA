@@ -15,7 +15,7 @@ struct ipz
 
 typedef struct ipz* ipz_t;
 
-void ipz_init(ipz_t x);
+void ipz_init(ipz_t* x);
 void ipz_init_set_str(ipz_t x, const string s);
 void ipz_printf(ipz_t x);
 
