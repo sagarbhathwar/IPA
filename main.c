@@ -14,6 +14,6 @@ int main()
 	scanf("%s %s", s1, s2);
 	ipz_init_set_str(a, s1);
 	ipz_init_set_str(b, s2);
-	ipz_mul(c, a, b);
+	ipz_modulo(c, a, b);
 	ipz_printf(c);
 }
