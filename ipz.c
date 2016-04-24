@@ -3,8 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include "ipz.h"
-#include "util.h"
 #define ZERO 48
+
+static ipz_t zero = NULL;
 
 ipz_t
 ipz_init()
@@ -63,6 +64,34 @@ ipz_copy(ipz_t destination, ipz_t source)
 	destination->digits = malloc(effective_length*sizeof(char));
 	memcpy(destination->digits, ptr, effective_length*sizeof(char));
 	destination->number_of_digits = effective_length;
+}
+
+
+void
+append_zeroes(ipz_t input, unsigned int n)
+{
+	if (input->number_of_digits == 1 && input->digits[0] == 0) return;
+
+	input->digits = realloc(input->digits, (n + input->number_of_digits)*sizeof(char));
+	memset(input->digits + input->number_of_digits, 0, n*sizeof(char));
+	input->number_of_digits = input->number_of_digits + n;
+}
+
+void
+split(ipz_t source, ipz_t first_part, ipz_t second_part, int length)
+{
+	if (source->number_of_digits == 1 || source->number_of_digits < length)
+	{
+		first_part->number_of_digits = 1;
+		second_part->number_of_digits = source->number_of_digits;
+		first_part->digits = zero->digits;
+		second_part->digits = source->digits;
+		return;
+	}
+	first_part->number_of_digits = (source->number_of_digits) / 2;
+	second_part->number_of_digits = (source->number_of_digits) - first_part->number_of_digits;
+	first_part->digits = source->digits;
+	second_part->digits = source->digits + first_part->number_of_digits;
 }
 
 void
@@ -143,6 +172,7 @@ ipz_sub(ipz_t difference, ipz_t minuend, ipz_t subtrahend)
 	free(result);
 }
 
+
 ipz_t
 _karatsuba_multiplication(ipz_t multiplicand, ipz_t multiplier)
 {
@@ -179,7 +209,7 @@ _karatsuba_multiplication(ipz_t multiplicand, ipz_t multiplier)
 	ipz_t b1_add_b2 = ipz_init();
 
 	ipz_t largest_number = 
-		(multiplicand->number_of_digits) > (multiplier->digits) 
+		(multiplicand->number_of_digits) > (multiplier->number_of_digits) 
 		?
 		multiplicand : multiplier;
 
@@ -191,12 +221,11 @@ _karatsuba_multiplication(ipz_t multiplicand, ipz_t multiplier)
 
 	ipz_t p1 = _karatsuba_multiplication(a1, b1);
 	ipz_t p2 = _karatsuba_multiplication(a2, b2);
-	ipz_printf(a1_add_a2);
-	ipz_printf(b1_add_b2);
 	ipz_t p3 = _karatsuba_multiplication(a1_add_a2, b1_add_b2);
 
 	ipz_t p1_add_p2 = ipz_init();
 	ipz_t p3_diff_p2_diff_p1 = ipz_init();
+
 	ipz_add(p1_add_p2, p1, p2);
 	ipz_sub(p3_diff_p2_diff_p1, p3, p1_add_p2);
 
@@ -226,8 +255,10 @@ _karatsuba_multiplication(ipz_t multiplicand, ipz_t multiplier)
 void
 ipz_mul(ipz_t product, ipz_t multiplicand, ipz_t multiplier)
 {
-		ipz_t _product = _karatsuba_multiplication(multiplicand, multiplier);
-		product->digits = _product->digits;
-		product->number_of_digits = _product->number_of_digits;
-		free(_product);
+	zero = ipz_init();
+	ipz_init_set_str(zero, "0");
+	ipz_t _product = _karatsuba_multiplication(multiplicand, multiplier);
+	product->digits = _product->digits;
+	product->number_of_digits = _product->number_of_digits;
+	free(_product);
 }
